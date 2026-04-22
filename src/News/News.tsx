@@ -1,7 +1,6 @@
 // src/pages/News.jsx
 import { useEffect, useState } from "react";
 import axios from "axios";
-import "./News.css";
 
 const SPACE_NEWS_API = "https://api.spaceflightnewsapi.net/v4/articles/?limit=50";
 const NASA_RSS = "https://api.rss2json.com/v1/api.json?rss_url=https://www.nasa.gov/rss/dyn/breaking_news.rss";

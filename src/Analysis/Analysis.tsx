@@ -1,8 +1,5 @@
 import React, { useState, useMemo } from "react";
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import "react-datepicker/dist/react-datepicker.css";
-import "./Analysis.css";
 import DatePicker from "react-datepicker";
 import { format } from "date-fns";
 import useFlareData from "../Solar Flare/hooks/useFlareData";

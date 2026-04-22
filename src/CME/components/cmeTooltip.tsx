@@ -1,5 +1,4 @@
 import React from 'react';
-import './cme.css';
 
 export default function CmeTooltip({ cme, onClose }) {
   if (!cme) return null;

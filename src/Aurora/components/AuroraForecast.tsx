@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import useAuroraData from '../hooks/useAuroraData';
 import AuroraGlobe from './AuroraGlobe';
 import AuroraTimeline from './AuroraTimeline';
-import './AuroraForecast.css';
 
 export default function AuroraForecast() {
   const { kpForecast, loading, error } = useAuroraData();

@@ -4,12 +4,10 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Globe from 'react-globe.gl';
 import * as THREE from 'three';
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import { computeSubsolarPoint } from '../utils/geoUtils';
 import useFlareData from "../hooks/useFlareData";
 import RiskDashboard from "../components/RiskDashboard";
 import { format } from 'date-fns';
-import './Globe.css';
 
 export default function GlobeVisualizer({
   cityData = [],

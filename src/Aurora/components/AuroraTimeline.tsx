@@ -1,5 +1,4 @@
 import React from 'react';
-import './AuroraForecast.css';
 
 export default function AuroraTimeline({ kpForecast, onSelectHour }) {
   return (

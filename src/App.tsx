@@ -16,15 +16,13 @@ import Home from "./Home/Home";
 import AboutPage from './About/AboutPage';
 
 
-import './App.css'; 
-
 export default function App() {
   const { flares, loading, error, refresh } = useFlareData();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   return (
     <Router>
-      <div className="app-container">
+      <div className="relative h-screen w-screen text-white">
         <Navbar />
 
         <Routes>

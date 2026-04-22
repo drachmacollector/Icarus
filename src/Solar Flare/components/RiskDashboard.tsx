@@ -7,7 +7,6 @@ import {
   CloudLightning,
   AirVent
 } from "lucide-react";
-import "./RiskDashboard.css";
 
 export default function RiskDashboard({ flares, forecast }) {
   const getRiskLevel = () => {

@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import './Timeline.css';
 import {
   VerticalTimeline,
   VerticalTimelineElement,
 } from "react-vertical-timeline-component";
-import "react-vertical-timeline-component/style.min.css";
 import { FaSun, FaBolt, FaRadiationAlt, FaCircleNotch } from "react-icons/fa";
 
 const API_KEY = "7xojuNa1rk1mpSTQ5ZPG1oD60Yo4FvKUOuvIfn3w";

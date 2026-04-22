@@ -1,10 +1,8 @@
 import React, { useState, useRef } from 'react';
 import Globe from 'react-globe.gl';
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import useCmeData from '../hooks/useCmeData';
 import CmeTooltip from './cmeTooltip';
-import './cme.css';
 
 export default function CmeTracker() {
   const [rangeStart, setRangeStart] = useState(null);

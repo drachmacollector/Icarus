@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import AOS from "aos";
-import "aos/dist/aos.css";
-import "./AboutPage.css";
 import CursorAurora from "./CursorAurora";
 import styled from "@emotion/styled";
 import {
