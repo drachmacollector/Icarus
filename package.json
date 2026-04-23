@@ -28,6 +28,7 @@
     "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.6.3",
     "react-vertical-timeline-component": "^3.5.3",
+    "recharts": "^3.8.1",
     "three": "^0.178.0"
   },
   "devDependencies": {
