@@ -1,246 +1,296 @@
-// src/GIC/GIC.tsx
-import React, { useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import axios from "axios";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
   Tooltip,
   ResponsiveContainer,
-  Cell,
-  CartesianGrid,
-  Legend,
   ComposedChart,
-  Line
+  Line,
+  Area,
 } from "recharts";
+import { 
+  Activity, 
+  Zap, 
+  Satellite, 
+  Radio, 
+  Compass, 
+  RefreshCw,
+  Clock,
+  ChevronRight
+} from "lucide-react";
 
-export default function GICPage() {
+// --- Types ---
+interface KpDataPoint {
+  time_tag: string;
+  kp: number;
+  observed: "observed" | "estimated" | "predicted";
+  noaa_scale: string | null;
+}
 
+const NOAA_URL = "https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json";
 
-  const rawData = [
-    { time: "2026-04-02T00:00:00Z", kp: 2 },
-    { time: "2026-04-02T01:00:00Z", kp: 3 },
-    { time: "2026-04-02T03:00:00Z", kp: 4 },
-    { time: "2026-04-02T06:00:00Z", kp: 6 },
-    { time: "2026-04-02T09:00:00Z", kp: 7 },
-    { time: "2026-04-02T12:00:00Z", kp: 5 },
-    { time: "2026-04-02T15:00:00Z", kp: 4 },
-    { time: "2026-04-02T18:00:00Z", kp: 2 },
-    { time: "2026-04-02T21:00:00Z", kp: 3 }
-  ];
+// --- Styling Helpers ---
+const getKpColor = (kp: number) => {
+  if (kp >= 7) return "#fb7185"; // rose-400
+  if (kp >= 5) return "#fb923c"; // orange-400
+  if (kp >= 4) return "#facc15"; // yellow-400
+  return "#34d399";            // emerald-400
+};
 
-  
-  const formattedData = useMemo(() => {
-    const grouped: Record<string, { values: number[], count: number, max: number, avg: number }> = {};
+const getRiskLevel = (kp: number) => {
+  if (kp >= 7) return { label: "SEVERE", color: "text-rose-400", glow: "from-rose-500/10" };
+  if (kp >= 5) return { label: "MODERATE", color: "text-orange-400", glow: "from-orange-400/10" };
+  if (kp >= 4) return { label: "ACTIVE", color: "text-yellow-400", glow: "from-yellow-400/5" };
+  return { label: "QUIET", color: "text-emerald-400", glow: "from-emerald-400/5" };
+};
 
-    rawData.forEach((item) => {
-      const date = new Date(item.time);
-      const hour = date.getUTCHours();
+// --- Components ---
 
-      const start = Math.floor(hour / 3) * 3;
-      const end = start + 3;
+const GlassCard = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => (
+  <div className={`relative overflow-hidden rounded-[2.5rem] bg-white/[0.02] backdrop-blur-[40px] shadow-2xl shadow-black/50 ${className}`}>
+    <div className="relative z-10">{children}</div>
+  </div>
+);
 
-      const key = `${String(start).padStart(2, "0")}-${String(end).padStart(2, "0")}`;
-
-      if (!grouped[key]) grouped[key] = { values: [], count: 0, max: 0, avg: 0 };
-      grouped[key].values.push(item.kp);
-      grouped[key].count++;
-    });
-
-    return Object.entries(grouped).map(([timeSlot, data]) => {
-      const avg = data.values.reduce((a, b) => a + b, 0) / data.count;
-      return {
-        timeSlot,
-        kp: Math.max(...data.values),
-        avg: parseFloat(avg.toFixed(2)),
-        min: Math.min(...data.values),
-        dataPoints: data.values.length
-      };
-    });
-  }, [rawData]);
-
-  const maxKp = Math.max(...formattedData.map(d => d.kp));
-
-  // Enhanced color logic with more gradations
-  const getBarColor = (kp: number) => {
-    if (kp >= 8) return "#7f1d1d";     // very dark red (extreme)
-    if (kp >= 7) return "#dc2626";     // dark red (severe)
-    if (kp >= 6) return "#ef4444";     // red (critical)
-    if (kp >= 5) return "#f97316";     // orange (high)
-    if (kp >= 4) return "#eab308";     // yellow (moderate)
-    if (kp >= 3) return "#84cc16";     // lime (active)
-    return "#22c55e";                  // green (quiet)
-  };
-
-  const getRiskLevel = (kp: number) => {
-    if (kp >= 8) return { level: "EXTREME", color: "text-red-600", bgColor: "bg-red-900/30", borderColor: "border-red-500" };
-    if (kp >= 7) return { level: "SEVERE", color: "text-red-500", bgColor: "bg-red-900/30", borderColor: "border-red-500" };
-    if (kp >= 6) return { level: "CRITICAL", color: "text-orange-500", bgColor: "bg-orange-900/30", borderColor: "border-orange-500" };
-    if (kp >= 5) return { level: "HIGH", color: "text-amber-500", bgColor: "bg-amber-900/30", borderColor: "border-amber-500" };
-    if (kp >= 4) return { level: "MODERATE", color: "text-yellow-500", bgColor: "bg-yellow-900/30", borderColor: "border-yellow-500" };
-    if (kp >= 3) return { level: "ACTIVE", color: "text-green-500", bgColor: "bg-green-900/30", borderColor: "border-green-500" };
-    return { level: "QUIET", color: "text-green-600", bgColor: "bg-green-900/20", borderColor: "border-green-600" };
-  };
-
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      const risk = getRiskLevel(data.kp);
-      return (
-        <div className="bg-gray-950 border-2 border-blue-400 rounded-lg p-4 text-xs shadow-lg">
-          <p className="text-blue-300 font-bold text-sm">{data.timeSlot} hrs</p>
-          <div className="mt-2 space-y-1">
-            <p className="text-cyan-300">📊 Peak Kp: <span className="font-bold text-lg">{data.kp}</span></p>
-            <p className="text-amber-300">📈 Average: <span className="font-bold">{data.avg}</span></p>
-            <p className="text-gray-400">🔍 Min-Max: {data.min}-{data.kp}</p>
-            <p className="text-purple-300">📍 Data points: {data.dataPoints}</p>
-            <p className={`font-semibold ${risk.color}`}>Risk: {risk.level}</p>
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
+const KpGauge = ({ value }: { value: number }) => {
+  const color = getKpColor(value);
+  const strokeWidth = 3;
+  const radius = 85;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (value / 9) * circumference;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0b1220] via-[#1a2a4a] to-[#0f1a2e] text-blue-100 p-8">
+    <div className="relative flex items-center justify-center w-full max-w-[320px] aspect-square mx-auto">
+      <svg className="w-full h-full -rotate-90" viewBox="0 0 200 200">
+        <circle
+          cx="100"
+          cy="100"
+          r={radius}
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          className="text-white/[0.01]"
+        />
+        <circle
+          cx="100"
+          cy="100"
+          r={radius}
+          stroke={color}
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          className="transition-all duration-1000 ease-out"
+          style={{ filter: `drop-shadow(0 0 15px ${color}40)` }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+        <span className="text-8xl font-thin tracking-tighter text-white/95 leading-none">{value.toFixed(1)}</span>
+        <span className="text-[11px] font-medium tracking-[0.5em] text-white/10 uppercase mt-4">Planetary Index</span>
+      </div>
+    </div>
+  );
+};
 
-      {/* HEADER */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2 tracking-wide bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-300 bg-clip-text text-transparent">
-          Geomagnetic Risk Monitor (GIC)
-        </h1>
-        <p className="text-sm text-gray-400">Real-time Space Weather Impact Analysis • April 2, 2026</p>
+export default function KpPage() {
+  const [data, setData] = useState<KpDataPoint[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(NOAA_URL);
+      setData(response.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 60000 * 15);
+    return () => clearInterval(interval);
+  }, []);
+
+  const latestPoint = useMemo(() => {
+    if (data.length === 0) return null;
+    const realPoints = data.filter(p => p.observed !== "predicted");
+    return realPoints[realPoints.length - 1] || data[0];
+  }, [data]);
+
+  const risk = useMemo(() => (latestPoint ? getRiskLevel(latestPoint.kp) : null), [latestPoint]);
+
+  if (loading && data.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#030508] flex items-center justify-center">
+        <div className="w-16 h-[1px] bg-white/10 animate-pulse" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#030508] text-white/70 font-sans selection:bg-white/5 pb-32">
+      
+      {/* Background Ambience */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b ${risk?.glow} to-transparent opacity-30 transition-all duration-1000 blur-[100px]`} />
       </div>
 
-      {/* ALERT BANNER */}
-      {maxKp >= 6 && (
-        <div className="mb-6 rounded-lg p-5 border-2 bg-red-900/30 border-red-500 shadow-lg shadow-red-500/20 animate-pulse">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">⚠️</span>
-              <div>
-                <h3 className="text-xl font-bold text-red-300">CRITICAL GEOMAGNETIC EVENT</h3>
-                <p className="text-sm text-gray-300">Peak Kp Index reached: <span className="text-red-400 font-bold">{maxKp}</span></p>
+      <div className="relative z-10 max-w-screen-xl mx-auto px-10 pt-24 space-y-32">
+        
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-16">
+          <div className="space-y-8">
+            <div className="flex items-center gap-6 text-[11px] font-bold tracking-[0.6em] text-white/20 uppercase">
+              <span>Space Systems Monitor</span>
+              <div className="w-1 h-1 rounded-full bg-white/10" />
+              <span>Kp Dynamics</span>
+            </div>
+            <h1 className="text-7xl md:text-[9rem] font-thin tracking-tighter text-white leading-none -ml-2">
+              Kp Index
+            </h1>
+            <div className="flex items-center gap-6 text-[10px] font-medium text-white/30 tracking-widest uppercase">
+              <Clock className="w-3 h-3 opacity-30" /> LAST SYNC: {new Date().toLocaleTimeString()} UTC
+            </div>
+          </div>
+          <button 
+            onClick={fetchData}
+            className="group p-5 rounded-full bg-white/[0.01] hover:bg-white/[0.04] transition-all duration-500"
+          >
+            <RefreshCw className="w-6 h-6 group-hover:rotate-180 transition-transform duration-700 opacity-20" />
+          </button>
+        </div>
+
+        {/* Hero */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+          <div className="space-y-16">
+            <KpGauge value={latestPoint?.kp || 0} />
+            <div className="text-center space-y-4">
+              <p className={`text-5xl font-extralight tracking-tight ${risk?.color}`}>{risk?.label}</p>
+              <p className="text-[11px] font-bold text-white/10 uppercase tracking-[0.4em]">Current Status</p>
+            </div>
+          </div>
+
+          <div className="space-y-16">
+            <div className="space-y-6">
+              <h3 className="text-3xl font-light text-white tracking-tight leading-snug">Global geomagnetic activity is currently <span className={risk?.color}>{risk?.label.toLowerCase()}</span>.</h3>
+              <p className="text-base text-white/30 leading-relaxed font-light">
+                The Kp-index measures global geomagnetic activity levels from 0 to 9. We monitor these fluctuations to assess risk to satellite infrastructure and power transmission.
+              </p>
+            </div>
+            
+            <div className="flex gap-16 pt-12">
+              <div className="space-y-2">
+                <p className="text-4xl font-extralight text-white">{Math.max(...data.map(d => d.kp)).toFixed(1)}</p>
+                <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">72H PEAK</p>
+              </div>
+              <div className="space-y-2">
+                <p className="text-4xl font-extralight text-white">{data.filter(p => p.kp >= 5).length}</p>
+                <p className="text-[10px] font-bold text-white/20 uppercase tracking-widest">STORM EVENTS</p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-xs text-gray-400">Risk Status</p>
-              <p className="text-2xl font-bold text-red-400">{getRiskLevel(maxKp).level}</p>
+          </div>
+        </div>
+
+        {/* Timeline */}
+        <div className="space-y-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-10 px-4">
+            <div className="space-y-3">
+              <h3 className="text-2xl font-light text-white tracking-tight">Timeline Trend</h3>
+              <p className="text-[10px] text-white/20 font-bold uppercase tracking-widest">Active Forecast Distribution</p>
+            </div>
+            <div className="flex gap-12">
+              <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-white/20">
+                <div className="w-1.5 h-1.5 rounded-full bg-white/20" /> Observed
+              </div>
+              <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-white/20">
+                <div className="w-1.5 h-1.5 rounded-full border border-white/20" /> Predicted
+              </div>
             </div>
           </div>
+
+          <GlassCard className="p-16">
+            <div className="h-[360px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <ComposedChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                  <Tooltip 
+                    cursor={{ stroke: 'rgba(255,255,255,0.02)', strokeWidth: 1 }}
+                    contentStyle={{ 
+                      backgroundColor: 'rgba(3, 5, 8, 0.98)', 
+                      border: 'none', 
+                      borderRadius: '32px',
+                      backdropFilter: 'blur(30px)',
+                      boxShadow: '0 32px 64px rgba(0,0,0,0.9)',
+                      padding: '24px'
+                    }}
+                    itemStyle={{ fontSize: '13px', fontWeight: '300', color: 'rgba(255,255,255,0.8)' }}
+                    labelStyle={{ display: 'none' }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="kp" 
+                    stroke="none" 
+                    fill="white" 
+                    fillOpacity={0.01} 
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="kp" 
+                    stroke="rgba(255,255,255,0.1)" 
+                    strokeWidth={1} 
+                    dot={(props: any) => {
+                      const isPredicted = props.payload.observed === "predicted";
+                      const kpColor = getKpColor(props.payload.kp);
+                      if (props.index % 4 !== 0) return null;
+                      return (
+                        <circle 
+                          cx={props.cx} 
+                          cy={props.cy} 
+                          r={2} 
+                          fill={isPredicted ? "transparent" : kpColor} 
+                          stroke={kpColor} 
+                          strokeWidth={1}
+                          style={{ filter: `drop-shadow(0 0 10px ${kpColor}80)` }}
+                        />
+                      );
+                    }}
+                  />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+          </GlassCard>
         </div>
-      )}
 
-      {/* GRAPH */}
-      <div className="bg-white/5 backdrop-blur-md border border-blue-400/30 rounded-2xl p-6 mb-8 shadow-2xl hover:shadow-blue-500/10 transition-all">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-blue-300 mb-1">Kp Index Timeline (3-Hour Windows)</h2>
-          <p className="text-xs text-gray-400">Showing peak values with average and data point distribution across 24-hour forecast</p>
+        {/* Impacts */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-20 px-4 pt-10">
+          {[
+            { icon: Zap, label: "Power Grids", desc: "Transformer saturation risks." },
+            { icon: Satellite, label: "Satellites", desc: "Surface charging disturbances." },
+            { icon: Radio, label: "HF Radio", desc: "Ionospheric signal absorption." },
+            { icon: Compass, label: "Navigation", desc: "L-Band signal fluctuations." },
+          ].map((item, i) => (
+            <div key={i} className="space-y-8 group">
+              <div className="w-16 h-16 rounded-[2rem] bg-white/[0.01] flex items-center justify-center text-white/10 group-hover:text-white/40 transition-all duration-700">
+                <item.icon className="w-6 h-6 stroke-[1.5]" />
+              </div>
+              <div className="space-y-3">
+                <h5 className="text-base font-light text-white tracking-tight">{item.label}</h5>
+                <p className="text-[11px] text-white/20 leading-relaxed font-light">{item.desc}</p>
+              </div>
+            </div>
+          ))}
         </div>
 
-        <ResponsiveContainer width="100%" height={400}>
-          <ComposedChart data={formattedData} margin={{ top: 10, right: 20, left: 0, bottom: 40 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1e3a5f" vertical={false} />
-            <XAxis 
-              dataKey="timeSlot" 
-              stroke="#64748b" 
-              label={{ value: "Time Window (UTC)", position: "insideBottomLeft", offset: -10 }}
-              tick={{ fontSize: 12, fill: "#94a3b8" }}
-            />
-            <YAxis 
-              domain={[0, 9]}
-              stroke="#64748b"
-              label={{ value: "Kp Index", angle: -90, position: "insideLeft", fill: "#94a3b8" }}
-              tick={{ fontSize: 12, fill: "#94a3b8" }}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ paddingTop: "20px" }} />
-            <Bar dataKey="kp" name="Peak Kp Index" radius={[8, 8, 0, 0]} opacity={0.85}>
-              {formattedData.map((entry, index) => (
-                <Cell key={index} fill={getBarColor(entry.kp)} />
-              ))}
-            </Bar>
-            <Line type="monotone" dataKey="avg" name="Average Kp" stroke="#06b6d4" strokeWidth={2} dot={{ fill: "#06b6d4", r: 4 }} />
-          </ComposedChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* METRICS GRID */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-
-        {/* Peak Kp */}
-        <div className={`rounded-xl p-5 border-2 ${getRiskLevel(maxKp).bgColor} ${getRiskLevel(maxKp).borderColor} shadow-lg backdrop-blur-sm hover:shadow-red-500/20 transition-all`}>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-blue-300">Peak Kp Index</h3>
-            <span className="text-2xl">📊</span>
-          </div>
-          <p className={`text-4xl font-bold mb-1 ${getRiskLevel(maxKp).color}`}>{maxKp}</p>
-          <p className="text-xs text-gray-400">{getRiskLevel(maxKp).level} Risk Level</p>
-        </div>
-
-        {/* Avg Kp */}
-        <div className="rounded-xl p-5 border-2 bg-cyan-900/30 border-cyan-500 shadow-lg backdrop-blur-sm hover:shadow-cyan-500/20 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-cyan-300">Average Kp</h3>
-            <span className="text-2xl">📈</span>
-          </div>
-          <p className="text-4xl font-bold text-cyan-100 mb-1">
-            {(formattedData.reduce((sum, d) => sum + d.avg, 0) / formattedData.length).toFixed(2)}
+        {/* Final Info */}
+        <div className="pt-32 text-center space-y-10">
+          <p className="text-[10px] font-bold uppercase tracking-[0.5em] text-white/10 max-w-lg mx-auto leading-relaxed">
+            Geomagnetic storms are calculated using the planetary K-index, representing the mean of K-indices at various observatories.
           </p>
-          <p className="text-xs text-gray-400">24-hour mean</p>
-        </div>
-
-        {/* Time Windows */}
-        <div className="rounded-xl p-5 border-2 bg-purple-900/30 border-purple-500 shadow-lg backdrop-blur-sm hover:shadow-purple-500/20 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-purple-300">Intervals</h3>
-            <span className="text-2xl">🕐</span>
-          </div>
-          <p className="text-4xl font-bold text-purple-100 mb-1">{formattedData.length}</p>
-          <p className="text-xs text-gray-400">3-hour windows analyzed</p>
-        </div>
-
-        {/* Total Data Points */}
-        <div className="rounded-xl p-5 border-2 bg-amber-900/30 border-amber-500 shadow-lg backdrop-blur-sm hover:shadow-amber-500/20 transition-all">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-amber-300">Data Points</h3>
-            <span className="text-2xl">📍</span>
-          </div>
-          <p className="text-4xl font-bold text-amber-100 mb-1">{rawData.length}</p>
-          <p className="text-xs text-gray-400">Total observations</p>
-        </div>
-
-      </div>
-
-      {/* INFO PANEL */}
-      <div className="grid md:grid-cols-3 gap-5">
-
-        <div className="bg-white/5 border border-blue-400/30 rounded-xl p-5 backdrop-blur-sm hover:border-blue-400/60 transition-all">
-          <h3 className="text-sm font-bold text-blue-300 mb-3 flex items-center gap-2">
-            <span>ℹ️</span> What is Kp Index?
-          </h3>
-          <p className="text-xs text-gray-300 leading-relaxed">
-            Kp measures geomagnetic storm intensity on a 0–9 scale. Higher values indicate stronger auroral activity and greater space weather disturbances.
-          </p>
-        </div>
-
-        <div className="bg-white/5 border border-green-400/30 rounded-xl p-5 backdrop-blur-sm hover:border-green-400/60 transition-all">
-          <h3 className="text-sm font-bold text-green-300 mb-3 flex items-center gap-2">
-            <span>⚡</span> Risk Levels
-          </h3>
-          <p className="text-xs text-gray-300 leading-relaxed">
-            0–3: Quiet | 4–5: Active | 6: Critical | 7–8: Severe | 9: Extreme. Monitor critical levels closely for infrastructure impacts.
-          </p>
-        </div>
-
-        <div className="bg-white/5 border border-orange-400/30 rounded-xl p-5 backdrop-blur-sm hover:border-orange-400/60 transition-all">
-          <h3 className="text-sm font-bold text-orange-300 mb-3 flex items-center gap-2">
-            <span>🛰️</span> Grid Impact
-          </h3>
-          <p className="text-xs text-gray-300 leading-relaxed">
-            High Kp can induce dangerous currents (GIC) in power grids, disrupt GPS, affect satellite communications, and cause HF radio blackouts.
-          </p>
+          <button className="text-[11px] font-bold uppercase tracking-[0.4em] text-white/30 hover:text-white transition-all duration-700 flex items-center gap-3 mx-auto group">
+            NOAA Technical Scales <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </button>
         </div>
 
       </div>

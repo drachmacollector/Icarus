@@ -4,6 +4,7 @@ import DatePicker from "react-datepicker";
 import { format } from "date-fns";
 import useFlareData from "../Solar Flare/hooks/useFlareData";
 import useCmeData from "../CME/hooks/useCmeData";
+import GICPanel from "./GIC/GICPanel";
 
 function toDMS(deg, isLat) {
   if (deg === null || deg === undefined) return "Unknown";
@@ -153,6 +154,9 @@ export default function analysisPage() {
           </button>
         </div>
       </div>
+
+      {/* GIC Forecast Panel */}
+      <GICPanel flares={flares} loading={loading} />
 
       <div className="map-layout">
         <div className="map-wrapper">
