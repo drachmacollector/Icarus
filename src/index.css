@@ -292,6 +292,7 @@ body {
   padding: 1rem 2rem;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
 }
 
 .notification-area {
@@ -308,11 +309,13 @@ body {
   display: flex;
   gap: 1rem;
   align-items: flex-end;
+  flex-wrap: wrap;
 }
 
 .date-picker-group {
   display: flex;
   flex-direction: column;
+  min-width: 150px;
 }
 
 .date-label {
@@ -323,9 +326,10 @@ body {
   letter-spacing: 1px;
 }
 
-/* Date Picker Input Styling */
+/* Date Picker Input Styling - Analysis page */
 .datepicker {
-  width: 100%;
+  width: 100% !important;
+  box-sizing: border-box !important;
   background: rgba(15, 18, 35, 0.9);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 6px;
@@ -418,10 +422,26 @@ body {
 }
 
 /* Responsive adjustments */
+@media (max-width: 900px) {
+  .map-layout {
+    flex-direction: column;
+    min-height: auto;
+  }
+  .map-wrapper {
+    width: 100%;
+    height: 50vh;
+  }
+  .info-panel-analysis {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+}
+
 @media (max-width: 768px) {
   .title-date-controls {
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
+    padding: 1rem;
   }
   
   .controls-right {
@@ -431,10 +451,24 @@ body {
   
   .date-picker-group {
     width: calc(50% - 0.5rem);
+    min-width: 130px;
   }
   
   .reset-btn {
     width: 100%;
+  }
+
+  .analysis-container {
+    padding: 1rem;
+    zoom: 100%;
+  }
+
+  .panel-stats {
+    flex-wrap: wrap;
+  }
+
+  .stats-card {
+    min-width: calc(50% - 0.5rem);
   }
 }
 
@@ -464,12 +498,16 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  width: 97%;
+  right: 0;
+  width: 100%;
+  box-sizing: border-box;
   padding: 0.8rem 1rem;
   background: rgba(15, 18, 35, 0.9);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   z-index: 1000;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -612,8 +650,8 @@ body {
 /* Panel Controls */
 .panel-controls {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 1.5rem;
+  grid-template-columns: 1fr;
+  gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
@@ -624,22 +662,7 @@ body {
   font-size: 0.9rem;
 }
 
-.datepicker {
-  width: 100%;
-  padding: 0.7rem 1rem;
-  background: rgba(25, 30, 50, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
-  color: #e0f7ff;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-}
-
-.datepicker:focus {
-  outline: none;
-  border-color: #ffa502;
-  box-shadow: 0 0 15px rgba(255, 165, 2, 0.4);
-}
+/* Note: .datepicker styles are defined above near .date-label */
 
 /* Toggle Switch */
 .location-toggle {
@@ -1251,7 +1274,8 @@ input:checked + .toggle-slider:before {
   position: absolute;
   top: 4.5rem;
   left: 20px;
-  width: 25%;
+  width: 280px;
+  max-width: calc(100vw - 40px);
   max-height: 82vh;
   z-index: 1000;
   background: rgba(10, 15, 30, 0.7);
@@ -1259,11 +1283,13 @@ input:checked + .toggle-slider:before {
   border-radius: 12px;
   padding: 1.2rem;
   overflow-y: auto;
+  overflow-x: hidden;
   color: #e0f0ff;
   backdrop-filter: blur(10px);
   box-shadow: 
     0 8px 32px rgba(0, 5, 20, 0.5),
     0 0 15px rgba(40, 80, 200, 0.1) inset;
+  box-sizing: border-box;
 }
 
 
@@ -1295,16 +1321,19 @@ input:checked + .toggle-slider:before {
 .react-datepicker-wrapper,
 .react-datepicker__input-container {
   display: block;
+  width: 100%;
 }
 
 .react-datepicker__input-container input {
-  width: 70%;
-  padding: 0.7rem;
-  background: rgba(5, 10, 25, 0.6);
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem 0.8rem;
+  background: rgba(5, 10, 25, 0.7);
   border: 1px solid rgba(100, 150, 255, 0.3);
-  border-radius: 6px;
+  border-radius: 8px;
   color: #e0f0ff;
   font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
   transition: all 0.2s;
 }
 
@@ -1312,6 +1341,10 @@ input:checked + .toggle-slider:before {
   outline: none;
   border-color: #4da6ff;
   box-shadow: 0 0 0 2px rgba(77, 166, 255, 0.2);
+}
+
+.react-datepicker__input-container input::placeholder {
+  color: rgba(160, 176, 255, 0.5);
 }
 
 /* Buttons */
@@ -1453,6 +1486,7 @@ input:checked + .toggle-slider:before {
 
 .datepicker-input {
   width: 100%;
+  box-sizing: border-box;
   padding: 0.6rem 0.8rem;
   border-radius: 8px;
   border: 1px solid rgba(100, 200, 255, 0.15);
@@ -1774,6 +1808,7 @@ h1 {
   z-index: 999;
   display: flex;
   justify-content: center;
+  align-items: center;
   background: rgba(15, 25, 40, 0.3);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1781,7 +1816,8 @@ h1 {
   padding: 0.5rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   transition: all 0.4s ease;
-  width: 65%;
+  width: auto;
+  max-width: 90vw;
 }
 
 .navbar:hover {
@@ -1791,7 +1827,9 @@ h1 {
 
 .navbar-links {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.25rem;
+  flex-wrap: nowrap;
+  align-items: center;
 }
 
 .nav-link {
@@ -1799,12 +1837,13 @@ h1 {
   text-decoration: none;
   font-family: 'Montserrat', sans-serif;
   font-weight: 500;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  padding: 0.7rem 1.5rem;
+  letter-spacing: 1px;
+  padding: 0.6rem 1rem;
   border-radius: 20px;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  white-space: nowrap;
 }
 
 .nav-link:hover {
@@ -1824,25 +1863,49 @@ h1 {
   transform: translateY(-1px);
 }
 
+@media (max-width: 768px) {
+  .navbar {
+    top: 0;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0 0 16px 16px;
+    padding: 0.4rem 0.5rem;
+  }
+  .nav-link {
+    font-size: 0.62rem;
+    padding: 0.5rem 0.6rem;
+    letter-spacing: 0.5px;
+  }
+  .navbar-links {
+    gap: 0.1rem;
+  }
+}
+
 .dropdown {
   display: flex;
   align-items: center;
   position: relative;
+  /* Extra padding-bottom creates an invisible hover bridge
+     between the toggle and the dropdown menu, eliminating
+     the dead zone that caused premature menu closure. */
+  padding-bottom: 0.6rem;
+  margin-bottom: -0.6rem;
 }
 
 .dropdown-toggle {
-  padding: 0.7rem 1.5rem; 
-  margin: 0;              
-  line-height: 1;         
+  padding: 0.6rem 1rem;
+  margin: 0;
+  line-height: 1;
   display: flex;
   align-items: center;
   cursor: pointer;
-  height: 100%;           
+  gap: 0.3rem;
+  border-radius: 20px;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-
-
-.dropdown-toggle:hover {
+.dropdown-toggle:hover,
+.dropdown-toggle.dropdown-open {
   color: #fff;
   text-shadow: 0 0 10px rgba(100, 200, 255, 0.7);
   background: rgba(30, 60, 100, 0.25);
@@ -1851,37 +1914,55 @@ h1 {
 
 .dropdown-menu {
   position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 0.5rem;
-  background: rgba(15, 25, 40, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* Sits flush against the bottom of the dropdown wrapper (which
+     includes the padding-bottom bridge), so there is zero gap. */
+  top: calc(100% - 0.6rem);
+  left: 50%;
+  transform: translateX(-50%);
+  /* Add padding-top so that the invisible bridge continues inside
+     the menu element itself — cursor never leaves a hover area. */
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  background: rgba(12, 18, 35, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(100, 200, 255, 0.15);
   border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-  min-width: 200px;
-  z-index: 1000;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(100, 200, 255, 0.08) inset;
+  min-width: 220px;
+  z-index: 2000;
   display: flex;
   flex-direction: column;
-  padding: 0.5rem 0;
+  animation: dropdownFadeIn 0.15s ease;
+}
+
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 .dropdown-item {
-  padding: 0.6rem 1.2rem;
+  padding: 0.65rem 1.4rem;
   font-family: 'Montserrat', sans-serif;
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   letter-spacing: 1.2px;
-  color: rgb(200, 220, 255);
+  color: rgb(180, 210, 255);
   text-decoration: none;
   text-transform: uppercase;
   transition: all 0.2s ease;
   white-space: nowrap;
+  border-radius: 8px;
+  margin: 0.1rem 0.4rem;
 }
 
 .dropdown-item:hover {
-  background-color: rgba(50, 120, 200, 0.25);
-  color: white;
-  text-shadow: 0 0 8px rgba(100, 200, 255, 0.5);
+  background: rgba(50, 120, 200, 0.3);
+  color: #fff;
+  text-shadow: 0 0 8px rgba(100, 200, 255, 0.6);
+  transform: translateX(4px);
+  padding-left: 1.6rem;
 }
 
 /* From News.css */
@@ -2443,17 +2524,8 @@ body {
 
 .react-datepicker-wrapper {
   flex: 1;
-  min-width: 120px;
-}
-
-.react-datepicker__input-container input {
+  min-width: 0;
   width: 100%;
-  padding: 0.6rem 0.8rem;
-  border-radius: 8px;
-  border: 1px solid rgba(100, 200, 255, 0.15);
-  background: rgba(15, 20, 35, 0.6);
-  color: #e0f7ff;
-  font-size: 0.85rem;
 }
 
 select {
@@ -2464,6 +2536,106 @@ select {
   background: rgba(15, 20, 35, 0.6);
   color: #e0f7ff;
   font-size: 0.85rem;
+}
+
+/* ==============================================
+   REACT-DATEPICKER DARK THEME OVERRIDES
+   ============================================== */
+.react-datepicker {
+  background: rgba(15, 18, 40, 0.98) !important;
+  border: 1px solid rgba(100, 150, 255, 0.3) !important;
+  border-radius: 12px !important;
+  font-family: 'Montserrat', sans-serif !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(77, 166, 255, 0.1);
+  color: #e0f0ff !important;
+}
+
+.react-datepicker__header {
+  background: rgba(20, 25, 50, 0.98) !important;
+  border-bottom: 1px solid rgba(100, 150, 255, 0.2) !important;
+  border-radius: 12px 12px 0 0 !important;
+  padding-top: 0.8rem;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name,
+.react-datepicker-time__header {
+  color: #a0b8ff !important;
+  font-weight: 500;
+}
+
+.react-datepicker__day {
+  color: #e0f0ff !important;
+  border-radius: 6px !important;
+  transition: all 0.15s ease;
+}
+
+.react-datepicker__day:hover {
+  background: rgba(77, 166, 255, 0.2) !important;
+  color: #fff !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--range-start,
+.react-datepicker__day--range-end {
+  background: linear-gradient(135deg, #1a5fa0, #5a3d8a) !important;
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(77, 166, 255, 0.4);
+}
+
+.react-datepicker__day--in-range {
+  background: rgba(77, 166, 255, 0.12) !important;
+  color: #e0f0ff !important;
+}
+
+.react-datepicker__day--keyboard-selected {
+  background: rgba(77, 166, 255, 0.25) !important;
+  color: #fff !important;
+}
+
+.react-datepicker__day--outside-month {
+  color: rgba(160, 176, 255, 0.3) !important;
+}
+
+.react-datepicker__day--disabled {
+  color: rgba(160, 176, 255, 0.2) !important;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: #a0b8ff !important;
+}
+
+.react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+  border-color: #4da6ff !important;
+}
+
+.react-datepicker__today-button {
+  background: rgba(26, 95, 160, 0.3);
+  border-top: 1px solid rgba(100, 150, 255, 0.2);
+  color: #4da6ff;
+  border-radius: 0 0 12px 12px;
+}
+
+.react-datepicker__today-button:hover {
+  background: rgba(26, 95, 160, 0.5);
+}
+
+.react-datepicker__close-icon::after {
+  background: rgba(77, 166, 255, 0.4) !important;
+  color: #fff !important;
+  border-radius: 50%;
+  font-size: 12px;
+  padding: 2px 4px;
+}
+
+.react-datepicker-popper {
+  z-index: 9999 !important;
+}
+
+/* Analysis page specific datepicker fixes */
+.datepicker {
+  box-sizing: border-box !important;
 }
 
 .loading-overlay, .error-overlay {

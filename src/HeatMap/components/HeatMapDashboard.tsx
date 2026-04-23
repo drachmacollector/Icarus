@@ -61,7 +61,11 @@ export default function HeatMapDashboard() {
             dateFormat="yyyy-MM-dd"
             placeholderText="Last 30 days"
             maxDate={new Date()}
+            minDate={new Date("2010-01-01")}
             className="datepicker-input"
+            showYearDropdown
+            scrollableYearDropdown
+            yearDropdownItemNumber={15}
           />
         </div>
 
@@ -73,7 +77,11 @@ export default function HeatMapDashboard() {
             dateFormat="yyyy-MM-dd"
             placeholderText="Today"
             maxDate={new Date()}
+            minDate={new Date("2010-01-01")}
             className="datepicker-input"
+            showYearDropdown
+            scrollableYearDropdown
+            yearDropdownItemNumber={15}
           />
         </div>
 

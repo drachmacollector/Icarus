@@ -111,6 +111,11 @@ export default function GlobeVisualizer({
             dateFormat="yyyy-MM-dd"
             isClearable
             placeholderText="Select date"
+            showYearDropdown
+            scrollableYearDropdown
+            yearDropdownItemNumber={15}
+            minDate={new Date("2010-01-01")}
+            maxDate={new Date()}
           />
         </div>
 
@@ -125,6 +130,11 @@ export default function GlobeVisualizer({
               endDate={endDate}
               dateFormat="yyyy-MM-dd"
               placeholderText="Start"
+              showYearDropdown
+              scrollableYearDropdown
+              yearDropdownItemNumber={15}
+              minDate={new Date("2010-01-01")}
+              maxDate={new Date()}
             />
             <DatePicker
               selected={endDate}
@@ -132,9 +142,13 @@ export default function GlobeVisualizer({
               selectsEnd
               startDate={startDate}
               endDate={endDate}
-              minDate={startDate}
+              minDate={startDate || new Date("2010-01-01")}
               dateFormat="yyyy-MM-dd"
               placeholderText="End"
+              showYearDropdown
+              scrollableYearDropdown
+              yearDropdownItemNumber={15}
+              maxDate={new Date()}
             />
           </div>
         </div>

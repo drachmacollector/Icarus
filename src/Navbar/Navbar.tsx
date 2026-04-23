@@ -1,9 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 export default function Navbar() {
   const location = useLocation();
   const [showDropdown, setShowDropdown] = useState(false);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const openDropdown = () => {
+    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    setShowDropdown(true);
+  };
+
+  const closeDropdown = () => {
+    hideTimerRef.current = setTimeout(() => setShowDropdown(false), 150);
+  };
 
   return (
     <nav className="navbar">
@@ -19,26 +29,32 @@ export default function Navbar() {
         {/* Dropdown Start */}
         <div
           className="dropdown"
-          onMouseEnter={() => setShowDropdown(true)}
-          onMouseLeave={() => setShowDropdown(false)}
+          onMouseEnter={openDropdown}
+          onMouseLeave={closeDropdown}
         >
-          <span className="nav-link dropdown-toggle">
+          <span
+            className={`nav-link dropdown-toggle ${showDropdown ? "dropdown-open" : ""}`}
+          >
             Solar Activity ▾
           </span>
 
           {showDropdown && (
-            <div className="dropdown-menu">
-              <Link to="/Flare" className="dropdown-item">Solar Flares</Link>
-              <Link to="/CmeTracker" className="dropdown-item">Coronal Mass Ejections</Link>
-              <Link to="/HeatMapDashboard" className="dropdown-item">Heat Map</Link>
-              <Link to="/AuroraForecast" className="dropdown-item">Auroras</Link>
+            <div
+              className="dropdown-menu"
+              onMouseEnter={openDropdown}
+              onMouseLeave={closeDropdown}
+            >
+              <Link to="/Flare" className="dropdown-item" onClick={() => setShowDropdown(false)}>Solar Flares</Link>
+              <Link to="/CmeTracker" className="dropdown-item" onClick={() => setShowDropdown(false)}>Coronal Mass Ejections</Link>
+              <Link to="/HeatMapDashboard" className="dropdown-item" onClick={() => setShowDropdown(false)}>Heat Map</Link>
+              <Link to="/AuroraForecast" className="dropdown-item" onClick={() => setShowDropdown(false)}>Auroras</Link>
             </div>
           )}
         </div>
         {/* Dropdown End */}
 
-        <Link to="/analysis" className={`nav-link ${location.pathname === "/analysis" ? "active" : ""}`}>
-          analysis
+        <Link to="/Analysis" className={`nav-link ${location.pathname === "/Analysis" ? "active" : ""}`}>
+          Analysis
         </Link>
 
         <Link to="/Timeline" className={`nav-link ${location.pathname === "/Timeline" ? "active" : ""}`}>

@@ -71,7 +71,11 @@ export default function CmeTracker() {
             onChange={setRangeStart}
             dateFormat="yyyy-MM-dd"
             maxDate={new Date()}
+            minDate={new Date("2010-01-01")}
             placeholderText="Select start date"
+            showYearDropdown
+            scrollableYearDropdown
+            yearDropdownItemNumber={15}
           />
         </div>
         
@@ -82,7 +86,11 @@ export default function CmeTracker() {
             onChange={setRangeEnd}
             dateFormat="yyyy-MM-dd"
             maxDate={new Date()}
+            minDate={new Date("2010-01-01")}
             placeholderText="Select end date"
+            showYearDropdown
+            scrollableYearDropdown
+            yearDropdownItemNumber={15}
           />
         </div>
 

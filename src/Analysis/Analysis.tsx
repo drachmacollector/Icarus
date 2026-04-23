@@ -128,6 +128,9 @@ export default function analysisPage() {
               minDate={new Date("2010-01-01")}
               placeholderText="Start Date"
               className="datepicker"
+              showYearDropdown
+              scrollableYearDropdown
+              yearDropdownItemNumber={15}
             />
           </div>
           <div className="date-picker-group">
@@ -140,6 +143,9 @@ export default function analysisPage() {
               minDate={startDate || new Date("2010-01-01")}
               placeholderText="End Date"
               className="datepicker"
+              showYearDropdown
+              scrollableYearDropdown
+              yearDropdownItemNumber={15}
             />
           </div>
           <button className="reset-btn" onClick={resetDateRange}>
@@ -236,6 +242,9 @@ export default function analysisPage() {
                 dateFormat="yyyy-MM-dd"
                 placeholderText="Choose a date"
                 className="datepicker"
+                showYearDropdown
+                scrollableYearDropdown
+                yearDropdownItemNumber={15}
               />
             </div>
             <div className="location-toggle">
