@@ -48,6 +48,8 @@ export default function Navbar() {
               <Link to="/CmeTracker" className="dropdown-item" onClick={() => setShowDropdown(false)}>Coronal Mass Ejections</Link>
               <Link to="/HeatMapDashboard" className="dropdown-item" onClick={() => setShowDropdown(false)}>Heat Map</Link>
               <Link to="/AuroraForecast" className="dropdown-item" onClick={() => setShowDropdown(false)}>Auroras</Link>
+              <Link to="/Kp" className="dropdown-item" onClick={() => setShowDropdown(false)}>Kp Index</Link>
+              
             </div>
           )}
         </div>

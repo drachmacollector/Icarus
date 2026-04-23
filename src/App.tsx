@@ -11,9 +11,11 @@ import News from './News/News';
 import AuroraForecast from './Aurora/components/AuroraForecast';
 import HeatMapGlobe from './HeatMap/components/HeatMapGlobe';
 import HeatMapDashboard from './HeatMap/components/HeatMapDashboard';
+import Kp from './Kp/Kp';
 import Timeline from "./Timeline/Timeline";
 import Home from "./Home/Home";
 import AboutPage from './About/AboutPage';
+
 
 
 export default function App() {
@@ -39,6 +41,7 @@ export default function App() {
           <Route path="/News" element={<News />} />
           <Route path="/AuroraForecast" element={<AuroraForecast />} />
           <Route path="/HeatMapDashboard" element={<HeatMapDashboard />} />
+          <Route path="/Kp" element={<Kp />} />
           <Route path="/Timeline" element={<Timeline />} />
           <Route path="/AboutPage" element={<AboutPage />} />
         </Routes>
