@@ -8,9 +8,9 @@ function gicFromKp(kp: number): number {
 }
 
 function getRiskTier(gic: number): "LOW" | "MEDIUM" | "HIGH" | "CRITICAL" {
-  if (gic < 2)  return "LOW";
+  if (gic < 5)  return "LOW";
   if (gic < 10) return "MEDIUM";
-  if (gic < 50) return "HIGH";
+  if (gic < 15) return "HIGH";
   return "CRITICAL";
 }
 
@@ -64,7 +64,7 @@ function computeGIC(pFlare: number, kp = 5.0): GICResult {
     gicLow: 11.31,
     gicHigh: 12.72,
     flareBoostPct: 196.2,
-    risk: "CRITICAL", // Force critical status
+    risk: "HIGH", // Force high status
   };
 }
 
